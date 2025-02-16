@@ -16,11 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Edit, Trash } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import {
   Table,
   TableBody,
@@ -30,13 +26,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import UpdateEventForm from "./UpdateTaskForm";
-import {
-  useDeleteEventMutation,
-  useGetUserCreatedEventQuery,
-} from "@/redux/features/events/eventsApi";
+
 import { toast } from "sonner";
 import Loading from "@/app/loading";
-import { useDeleteTaskMutation, useGetUserCreatedTaskQuery } from "@/redux/features/tasks/tasksApi";
+import {
+  useDeleteTaskMutation,
+  useGetUserCreatedTaskQuery,
+} from "@/redux/features/tasks/tasksApi";
 
 const TaskList = () => {
   const { data: userTaskData, isLoading } =
@@ -45,7 +41,7 @@ const TaskList = () => {
     <Loading />;
   }
   const [deleteTask] = useDeleteTaskMutation();
- 
+
   const handleDelete = async (id: string) => {
     toast.promise(deleteTask(id), {
       loading: "Deleting...",
@@ -59,10 +55,10 @@ const TaskList = () => {
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader>
           <CardTitle className="text-lg font-bold">
-            Events created by <span className="text-primary">Me</span>
+            Tasks created by <span className="text-primary">Me</span>
           </CardTitle>
           <CardDescription>
-            Manage your events and view their details.
+            Manage your tasks and view their details.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -71,7 +67,6 @@ const TaskList = () => {
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Due Date</TableHead>
-              
                 <TableHead>Status</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
@@ -81,7 +76,7 @@ const TaskList = () => {
                 <TableRow key={data._id}>
                   <TableCell className="font-medium">{data.title}</TableCell>
                   <TableCell>{data.dueDate}</TableCell>
-            
+
                   <TableCell>
                     <Badge variant="outline">{data.status}</Badge>
                   </TableCell>

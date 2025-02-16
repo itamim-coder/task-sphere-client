@@ -27,7 +27,7 @@ const Login = () => {
             <Card>
               <CardHeader>
                 <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-                  Welcome to Rentify
+                  Welcome to TaskSphere
                 </h2>
 
                 <CardDescription>

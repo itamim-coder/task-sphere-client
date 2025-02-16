@@ -10,7 +10,7 @@ const josefinSans = Josefin_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Event Ease",
+  title: "Task Sphere",
   description: "",
 };
 

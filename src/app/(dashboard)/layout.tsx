@@ -14,10 +14,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
-
-
-// Assuming you're using React and the user's ID is known
-
 export default function DashboardLayout({
   children,
 }: Readonly<{
@@ -28,15 +24,11 @@ export default function DashboardLayout({
   useEffect(() => {
     setIsLoading(true);
     if (!isLoggedIn()) {
-      // removeUserInfo(authKey);
+      removeUserInfo(authKey);
       return router.push("/login");
     }
   }, [router, isLoading]);
 
-  const logOut = () => {
-    removeUserInfo(authKey);
-    router.push("/");
-  };
 
   return (
     <SidebarProvider>

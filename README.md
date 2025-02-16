@@ -10,8 +10,8 @@
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/itamim-coder/event-ease-frontend.git
-cd event-ease-frontend
+git clone https://github.com/itamim-coder/task-sphere-client
+cd task-sphere-client
 npm install
 ```
 

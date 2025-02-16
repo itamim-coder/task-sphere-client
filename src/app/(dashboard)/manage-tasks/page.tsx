@@ -1,11 +1,9 @@
 "use client";
-import Loading from "@/app/loading";
+
 import AddTaskForm from "@/components/views/AddTaskForm";
 import TaskList from "@/components/views/TaskList";
 
-import { useGetAllEventsQuery } from "@/redux/features/events/eventsApi";
 
-import Image from "next/image";
 import React from "react";
 
 const ManageTasks = () => {

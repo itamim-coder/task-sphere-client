@@ -18,6 +18,8 @@ import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/features/auth/authSlice";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { storeUserInfo } from "@/services/auth.services";
+import Link from "next/link";
+import { toast } from "sonner";
 type FormValues = {
   email: string;
   password: string;
@@ -38,15 +40,15 @@ const SignInForm = () => {
     try {
       console.log(data);
       const res = await userLogin({ ...data }).unwrap();
-      console.log(res)
+      console.log(res);
       if (res?.token) {
-        // toast.success("Login Successfully");
+        toast.success("Login Successfully");
         storeUserInfo({ accessToken: res?.token });
         router.push("/dashboard");
       }
     } catch (err) {
       console.error(err);
-      // toast.error("Error during login!");
+      // toast.error(err);
     }
   };
   return (
@@ -85,6 +87,15 @@ const SignInForm = () => {
             </FormItem>
           )}
         />
+
+        <div className="text-right">
+          <Link
+            href="/forgot-password"
+            className="text-blue-600 hover:underline"
+          >
+            Forgot Password?
+          </Link>
+        </div>
 
         {/* Submit Button */}
         <Button type="submit" className="w-full">

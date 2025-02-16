@@ -30,7 +30,7 @@ const DashboardPage = () => {
   } = useForm({
     defaultValues: {
       username: profileData?.username || "",
-      password: "",
+  
     },
   });
 
@@ -43,13 +43,13 @@ const DashboardPage = () => {
       const res = await updateProfileData({
         updatedData: data,
       });
-      console.log(res);
+      // console.log(res);
       if (res) {
         toast.success("Updated Successfully");
       }
     } catch (err) {
       toast.error("failed");
-      console.log(err);
+      // console.log(err);
     }
   };
   const logOut = () => {
@@ -114,14 +114,7 @@ const DashboardPage = () => {
                 <span className="text-red-600">{errors.username.message}</span>
               )}
             </div>
-            <div>
-              <Label>New Password</Label>
-              <Input
-                type="password"
-                {...register("password")}
-                placeholder="Enter new password"
-              />
-            </div>
+    
             <Button
               className="bg-purple-500 text-white hover:bg-purple-600 w-full mt-4"
               type="submit"

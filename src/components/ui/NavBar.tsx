@@ -17,12 +17,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage } from "./avatar";
 import Link from "next/link";
-const navigation = [
-  { name: "Home", href: "/" },
-  { name: "About Us", href: "/about" },
-  { name: "Cars", href: "/cars" },
-  { name: "Contact", href: "/contact" },
-];
+import { getUserInfo, removeUserInfo } from "@/services/auth.services";
+import { authKey } from "@/constants/storageKey";
+import { useRouter } from "next/navigation";
+
+
 const userNavigation = [
   { name: "Your Profile", href: "#" },
   { name: "Settings", href: "#" },
@@ -36,7 +35,8 @@ function classNames(...classes: string[]) {
 function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
+  const { email } = getUserInfo();
+  console.log(email)
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -49,7 +49,11 @@ function NavBar() {
     };
   }, []);
 
-  const user = "";
+  const router = useRouter();
+  const logOut = () => {
+    removeUserInfo(authKey);
+    router.refresh();
+  };
   return (
     <div
       className={classNames(
@@ -63,7 +67,7 @@ function NavBar() {
             <div className="flex-shrink-0">
               <Link href={"/"} className="cursor">
                 {" "}
-                <p>Event Ease</p>
+                <p>Task Sphere</p>
               </Link>
 
               {/* <img
@@ -78,7 +82,7 @@ function NavBar() {
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6 gap-2">
-              {user?.email ? (
+              {email ? (
                 <>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -101,7 +105,7 @@ function NavBar() {
 
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        onClick={handleLogOut}
+                        onClick={logOut}
                         className="cursor-pointer"
                       >
                         <LogOut className="mr-2 h-4 w-4" />
@@ -142,25 +146,9 @@ function NavBar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden">
-          <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            {navigation.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                aria-current={item.current ? "page" : undefined}
-                className={classNames(
-                  item.current
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                  "block rounded-md px-3 py-2 text-base font-medium"
-                )}
-              >
-                {item.name}
-              </a>
-            ))}
-          </div>
+      
           <div className="border-t border-gray-700 pb-3 pt-4">
-            {user.email ? (
+            {email ? (
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

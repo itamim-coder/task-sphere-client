@@ -42,7 +42,7 @@ const SignInForm = () => {
       if (res?.token) {
         // toast.success("Login Successfully");
         storeUserInfo({ accessToken: res?.token });
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err) {
       console.error(err);

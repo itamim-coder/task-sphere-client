@@ -1,8 +1,11 @@
-import { useCurrentToken } from "@/redux/features/auth/authSlice";
-import { useAppSelector } from "@/redux/hooks";
-import { store } from "@/redux/store";
-import { ResponseSuccessType } from "@/types";
+
+import { authKey } from "@/constants/storageKey";
+import { IGenericErrorResponse, ResponseSuccessType } from "@/types";
+
 import axios from "axios";
+
+import { getFromLocalStorage } from "@/utils/local-storage";
+import { getNewAccessToken } from "@/services/auth.services";
 
 const instance = axios.create();
 instance.defaults.headers.post["Content-Type"] = "application/json";
@@ -12,10 +15,9 @@ instance.defaults.timeout = 60000;
 // Add a request interceptor
 instance.interceptors.request.use(
   function (config) {
-    const state = store.getState(); // Get the state from Redux store
-    const accessToken = state.auth?.token || null; // Adjust to your Redux slice
-    //   console.log(store, "Authorization Token");
-    //   console.log(accessToken, "Authorization Token");
+    // Do something before request is sent
+
+    const accessToken = getFromLocalStorage(authKey);
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -23,9 +25,12 @@ instance.interceptors.request.use(
     return config;
   },
   function (error) {
+    // Do something with request error
     return Promise.reject(error);
   }
 );
+
+// Add a response interceptor
 
 instance.interceptors.response.use(
   //@ts-ignore
@@ -38,30 +43,43 @@ instance.interceptors.response.use(
     return responseObject;
   },
   async function (error) {
-    if (error?.response?.status == 403) {
-    } else {
-      console.log(error);
-      let responseObject: any = {
-        statusCode: error?.response?.status || 500,
-        message: "Something went wrong",
-        success: false,
-        errorMessages: [],
-      };
-      if (error?.response?.data) {
-        responseObject.message =
-          error?.response?.data?.message || responseObject.message;
-        responseObject.success =
-          error?.response?.data?.success || responseObject.success;
-        if (error?.response?.data?.errorMessage) {
-          responseObject.errorMessages.push(
-            error?.response?.data?.errorMessage
-          );
+    const config = error?.config;
+    console.log(config);
+    console.log(error);
+    if (error?.response?.status === 403 && !config.sent) {
+      config.sent = true;
+      try {
+        const response = await getNewAccessToken();
+        if (response?.data?.accessToken) {
+          console.log("generate");
+          const accessToken = response?.data?.accessToken;
+          config.headers["Authorization"] = accessToken;
+          setToLocalStorage(authKey, accessToken);
+          return instance(config);
         }
+      } catch (tokenRefreshError) {
+        console.error("Token refresh failed", tokenRefreshError);
+        handleLogout();
       }
-      console.log(responseObject);
-      return Promise.reject(responseObject);
     }
+
+    if (error.response?.status === 400 || error.response?.status === 500) {
+      handleLogout();
+    }
+
+    const responseObject: IGenericErrorResponse = {
+      statusCode: error?.response?.data?.statusCode || 500,
+      message: error?.response?.data?.message || "Something went wrong",
+      errorMessages: error?.response?.data?.message,
+    };
+    return Promise.reject(responseObject);
   }
 );
+
+// Function to handle logout and redirection
+function handleLogout() {
+  removeUserInfo(authKey);
+  window.location.href = "/login"; // Redirect to login or home page
+}
 
 export { instance };

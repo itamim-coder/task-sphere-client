@@ -46,8 +46,8 @@ const data = {
     },
 
     {
-      title: "Events",
-      url: "/events",
+      title: "Manage Tasks",
+      url: "/manage-tasks",
       icon: BookOpen,
     },
   ],

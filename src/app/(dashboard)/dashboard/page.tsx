@@ -1,90 +1,137 @@
 "use client";
-import React from "react";
+import { Camera, LogOut, Pencil, Settings } from "lucide-react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  useProfileUpdateMutation,
+  useUserProfileQuery,
+} from "@/redux/features/auth/authApi";
+import Loading from "@/app/loading";
+import { toast } from "sonner";
+import { removeUserInfo } from "@/services/auth.services";
+import { authKey } from "@/constants/storageKey";
+import { useRouter } from "next/navigation";
 
 const DashboardPage = () => {
+  const router = useRouter();
+  const [editMode, setEditMode] = useState(false);
+  const { data: profileData, isLoading } = useUserProfileQuery(undefined);
+  const [updateProfileData] = useProfileUpdateMutation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      username: profileData?.username || "",
+      password: "",
+    },
+  });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  const onSubmit = async (data: any) => {
+    try {
+      const res = await updateProfileData({
+        updatedData: data,
+      });
+      console.log(res);
+      if (res) {
+        toast.success("Updated Successfully");
+      }
+    } catch (err) {
+      toast.error("failed");
+      console.log(err);
+    }
+  };
+  const logOut = () => {
+    removeUserInfo(authKey);
+    router.push("/");
+  };
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Profile Section */}
-        <div className="aspect-video rounded-xl bg-gradient-to-r from-blue-400 to-teal-500 text-white flex items-center justify-center shadow-lg hover:scale-105 transition duration-300 relative">
-          <div className="absolute top-4 left-4 bg-white/30 text-white text-sm py-1 px-3 rounded-full">
-            Profile
-          </div>
-          <div className="text-center">
-            <img
-              className="w-24 h-24 rounded-full mx-auto mb-4"
-              src="https://www.w3schools.com/w3images/avatar2.png"
-              alt="Profile Avatar"
+    <section className="container mx-auto max-w-3xl py-16">
+      <Card className="shadow-lg rounded-lg bg-white p-6 text-center">
+        <div className="relative mx-auto w-32 h-32">
+          <Avatar className="size-full border-4 border-purple-500">
+            <AvatarImage
+              src="https://shadcnblocks.com/images/block/avatar-1.webp"
+              alt="User Avatar"
             />
-            <h3 className="text-xl font-semibold mb-2">John Doe</h3>
-            <p className="text-sm">User bio or description...</p>
-          </div>
+            <AvatarFallback>JD</AvatarFallback>
+          </Avatar>
+          <button className="absolute bottom-2 right-2 flex items-center justify-center size-10 bg-purple-500 rounded-full text-white hover:bg-purple-600 transition">
+            <Camera className="size-5" />
+          </button>
         </div>
 
-        {/* Recent Activity Section */}
-        <div className="aspect-video rounded-xl bg-gradient-to-r from-purple-400 to-pink-500 text-white flex items-center justify-center shadow-lg hover:scale-105 transition duration-300 relative">
-          <div className="absolute top-4 left-4 bg-white/30 text-white text-sm py-1 px-3 rounded-full">
-            Recent Activity
-          </div>
-          <div className="text-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-16 w-16 mb-4 mx-auto text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 9l4-4m0 0l4 4m-4-4v12"
+        <h2 className="mt-4 text-2xl font-bold">{profileData?.username}</h2>
+        <p className="text-gray-500">{profileData?.email}</p>
+
+        <Button
+          className="mt-6 w-full bg-purple-500 text-white hover:bg-purple-600"
+          onClick={() => setEditMode(!editMode)}
+        >
+          <Pencil className="size-4 mr-2" /> Edit Profile
+        </Button>
+
+        <div className="mt-4 flex justify-between">
+          <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
+            <Settings className="size-4 mr-2" /> Settings
+          </Button>
+          <Button
+            onClick={logOut}
+            variant="ghost"
+            className="text-red-500 hover:text-red-700"
+          >
+            <LogOut className="size-4 mr-2" /> Logout
+          </Button>
+        </div>
+      </Card>
+
+      {editMode && (
+        <Card className="mt-6 shadow-md rounded-lg p-6">
+          <h3 className="text-xl font-semibold">Edit Profile</h3>
+          <form
+            className="mt-4 flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <div>
+              <Label>Name</Label>
+              <Input
+                type="text"
+                defaultValue={profileData?.username}
+                {...register("username", { required: "Name is required" })}
               />
-            </svg>
-            <h3 className="text-xl font-semibold mb-2">Last Booking</h3>
-            <p className="text-sm">
-              Completed booking for event XYZ on 12th Jan.
-            </p>
-            <p className="text-xs text-white/60 mt-2">
-              View all recent activity
-            </p>
-          </div>
-        </div>
-
-        {/* Upcoming Events Section */}
-        <div className="aspect-video rounded-xl bg-gradient-to-r from-yellow-400 to-red-500 text-white flex items-center justify-center shadow-lg hover:scale-105 transition duration-300 relative">
-          <div className="absolute top-4 left-4 bg-white/30 text-white text-sm py-1 px-3 rounded-full">
-            Upcoming Events
-          </div>
-          <div className="text-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-16 w-16 mb-4 mx-auto text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 9l4-4m0 0l4 4m-4-4v12"
+              {errors.username && (
+                <span className="text-red-600">{errors.username.message}</span>
+              )}
+            </div>
+            <div>
+              <Label>New Password</Label>
+              <Input
+                type="password"
+                {...register("password")}
+                placeholder="Enter new password"
               />
-            </svg>
-            <h3 className="text-xl font-semibold mb-2">Upcoming Event</h3>
-            <p className="text-sm">
-              Music concert happening on 20th Jan, tickets available.
-            </p>
-            <p className="text-xs text-white/60 mt-2">
-              View all upcoming events
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min"></div>
-    </div>
+            </div>
+            <Button
+              className="bg-purple-500 text-white hover:bg-purple-600 w-full mt-4"
+              type="submit"
+            >
+              Save Changes
+            </Button>
+          </form>
+        </Card>
+      )}
+    </section>
   );
 };
 

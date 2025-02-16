@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -19,53 +20,54 @@ import {
 } from "../ui/animated-modal";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
-import { useCreateEventMutation } from "@/redux/features/events/eventsApi";
 
-const AddEventForm = () => {
+import { Textarea } from "../ui/textarea";
+
+import { useCreateTaskMutation } from "@/redux/features/tasks/tasksApi";
+
+const AddTaskForm = () => {
   const form = useForm({
     defaultValues: {
-      name: "",
-      date: null,
-      location: "",
-      maxAttendees: 0,
+      title: "",
+      description: "",
+      dueDate: null,
     },
   });
-  const [addEvent] = useCreateEventMutation();
+  const [addTask] = useCreateTaskMutation();
   const onSubmit = async (data: any) => {
     try {
       const formattedData = {
         ...data,
-        date: data.date ? format(new Date(data.date), "dd-MM-yyyy") : null,
-        maxAttendees: parseInt(data.maxAttendees, 10), // Convert to a number
+        dueDate: data.dueDate ? format(new Date(data.dueDate), "dd-MM-yyyy") : null,
+
       };
-  
+
       console.log(formattedData);
-  
-      const res = await addEvent(formattedData).unwrap();
+
+      const res = await addTask(formattedData).unwrap();
       console.log(res);
-  
+
       if (res?._id) {
-        toast.success("Event Created Successfully");
+        toast.success("Task Created Successfully");
       }
     } catch (err) {
       console.log(err);
       alert(err);
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center">
       <Modal>
         <ModalTrigger className="bg-black dark:bg-white dark:text-black text-white flex justify-center group/modal-btn">
-          <span>Add Event</span>
+          <span>Add Task</span>
         </ModalTrigger>
         <ModalBody>
           <ModalContent className="overflow-y-auto">
             <h4 className="text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center mb-8">
               Add A{" "}
               <span className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800 dark:border-neutral-700 border border-gray-200">
-                Event
+                Task
               </span>{" "}
               now!
             </h4>
@@ -78,10 +80,10 @@ const AddEventForm = () => {
                 {/* Event Name */}
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Event Name</FormLabel>
+                      <FormLabel>Task Title</FormLabel>
                       <FormControl>
                         <Input
                           type="text"
@@ -97,10 +99,10 @@ const AddEventForm = () => {
                 {/* Date Picker */}
                 <FormField
                   control={form.control}
-                  name="date"
+                  name="dueDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Date</FormLabel>
+                      <FormLabel>Due Date</FormLabel>
                       <Calendar
                         mode="single"
                         selected={field.value}
@@ -115,14 +117,14 @@ const AddEventForm = () => {
                 {/* Location */}
                 <FormField
                   control={form.control}
-                  name="location"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Location</FormLabel>
+                      <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Event location"
+                        <Textarea
+                          // type="text"
+                          placeholder="Task Details"
                           {...field}
                         />
                       </FormControl>
@@ -131,25 +133,8 @@ const AddEventForm = () => {
                   )}
                 />
 
-                {/* Max Attendees */}
-                <FormField
-                  control={form.control}
-                  name="maxAttendees"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Max Attendees</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          min={1}
-                          placeholder="Enter number"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              
+       
 
                 {/* Submit Button */}
                 <button
@@ -167,4 +152,4 @@ const AddEventForm = () => {
   );
 };
 
-export default AddEventForm;
+export default AddTaskForm;

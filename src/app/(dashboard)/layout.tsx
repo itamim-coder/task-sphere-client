@@ -8,6 +8,10 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { authKey } from "@/constants/storageKey";
+import { isLoggedIn, removeUserInfo } from "@/services/auth.services";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 
 
@@ -19,8 +23,20 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  useEffect(() => {
+    setIsLoading(true);
+    if (!isLoggedIn()) {
+      // removeUserInfo(authKey);
+      return router.push("/login");
+    }
+  }, [router, isLoading]);
 
-
+  const logOut = () => {
+    removeUserInfo(authKey);
+    router.push("/");
+  };
 
   return (
     <SidebarProvider>

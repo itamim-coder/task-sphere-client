@@ -29,30 +29,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import UpdateEventForm from "./UpdateEventForm";
+import UpdateEventForm from "./UpdateTaskForm";
 import {
   useDeleteEventMutation,
   useGetUserCreatedEventQuery,
 } from "@/redux/features/events/eventsApi";
 import { toast } from "sonner";
 import Loading from "@/app/loading";
+import { useDeleteTaskMutation, useGetUserCreatedTaskQuery } from "@/redux/features/tasks/tasksApi";
 
-const EventsList = () => {
-  // const { data: userEventData, isLoading } =
-  //   useGetUserCreatedEventQuery(undefined);
-  // if (isLoading) {
-  //   <Loading />;
-  // }
-  // const [deleteEvent] = useDeleteEventMutation();
-  // // Display loading spinner while data is loading
-  // const handleDelete = async (id: string) => {
-  //   toast.promise(deleteEvent(id), {
-  //     loading: "Deleting...",
-  //     success: "Delete Successfully",
-  //     error: "Could not delete.",
-  //   });
-  // };
-  const userEventData = [];
+const TaskList = () => {
+  const { data: userTaskData, isLoading } =
+    useGetUserCreatedTaskQuery(undefined);
+  if (isLoading) {
+    <Loading />;
+  }
+  const [deleteTask] = useDeleteTaskMutation();
+ 
+  const handleDelete = async (id: string) => {
+    toast.promise(deleteTask(id), {
+      loading: "Deleting...",
+      success: "Delete Successfully",
+      error: "Could not delete.",
+    });
+  };
+
   return (
     <div className="">
       <Card x-chunk="dashboard-06-chunk-0">
@@ -68,21 +69,21 @@ const EventsList = () => {
           <Table className="overflow-x-scroll">
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead> Available Slot</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Due Date</TableHead>
+              
                 <TableHead>Status</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {userEventData?.map((event: any) => (
-                <TableRow key={event._id}>
-                  <TableCell className="font-medium">{event.name}</TableCell>
-                  <TableCell>{event.location}</TableCell>
-                  <TableCell>{event.maxAttendees}</TableCell>
+              {userTaskData?.map((data: any) => (
+                <TableRow key={data._id}>
+                  <TableCell className="font-medium">{data.title}</TableCell>
+                  <TableCell>{data.dueDate}</TableCell>
+            
                   <TableCell>
-                    <Badge variant="outline">{event.status}</Badge>
+                    <Badge variant="outline">{data.status}</Badge>
                   </TableCell>
                   <TableCell className="flex justify-start items-center gap-2">
                     <Dialog>
@@ -93,19 +94,19 @@ const EventsList = () => {
                         <DialogHeader>
                           <DialogTitle>
                             Update This{" "}
-                            <span className="text-primary">Event</span>
+                            <span className="text-primary">Task</span>
                           </DialogTitle>
                           <DialogDescription>
                             Give Proper Information
                           </DialogDescription>
                         </DialogHeader>
-                        <UpdateEventForm eventData={event} />
+                        <UpdateEventForm taskData={data} />
                       </DialogContent>
                     </Dialog>
 
                     <Popover>
                       <PopoverTrigger
-                        onClick={() => handleDelete(event?._id)}
+                        onClick={() => handleDelete(data?._id)}
                         asChild
                       >
                         <Trash className="h-4 w-4 text-primary cursor-pointer" />
@@ -122,4 +123,4 @@ const EventsList = () => {
   );
 };
 
-export default EventsList;
+export default TaskList;

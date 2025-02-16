@@ -21,11 +21,10 @@ import { toast } from "sonner";
 const RegisterForm = () => {
   const form = useForm({
     defaultValues: {
-      name: "",
+      username: "",
       email: "",
       password: "",
-      phone: "",
-      role: "user",
+
     },
   });
   const router = useRouter();
@@ -52,7 +51,7 @@ const RegisterForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
-          name="name"
+          name="username"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
@@ -93,23 +92,7 @@ const RegisterForm = () => {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone Number</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="Enter your phone number"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
 
         <Button type="submit" className="w-full">
           Register
